@@ -1,0 +1,5 @@
+**/*.json
+**/*.hcl
+**/*.terraform
+**/backend.tf
+**/provider.tf

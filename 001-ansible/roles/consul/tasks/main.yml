@@ -1,0 +1,29 @@
+---
+- name: Print Ansible facts
+  debug:
+    var: ansible_facts
+
+- name: Ensure directories for storage consul manifest
+  file:
+    path: "{{ consul_deploy_path }}"
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: '0755'
+
+- name: Deploy Consul manifest
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ consul_deploy_path }}/docker-compose.yml"
+
+- name: change permissions
+  file:
+    path: "{{ consul_deploy_path }}"
+    owner: '1000'
+    group: '1000'
+    recurse: yes
+
+- name: Run consul
+  shell: |
+    docker compose -f "{{ consul_deploy_path }}/docker-compose.yml" down
+    docker compose -f "{{ consul_deploy_path }}/docker-compose.yml" up -d

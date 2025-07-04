@@ -1,0 +1,18 @@
+services:
+{% for con in consul_server_cons %}
+  {{ con.name }}:
+    image: {{ consul_image_name }}:{{ consul_image_tag }}
+    container_name: {{ con.name }}
+    restart: unless-stopped
+    ports:
+{% for port in con.ports %}
+      - {{ port }}
+{% endfor %}
+    command:
+      - agent
+      - -server
+      - -ui
+      - -node={{ con.name }}
+      - -bootstrap-expect=1
+      - -client=0.0.0.0
+{% endfor %}

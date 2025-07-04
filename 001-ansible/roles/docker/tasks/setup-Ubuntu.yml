@@ -1,0 +1,68 @@
+---
+- name: Delete older trusted.gpg.d for docker 
+  file:
+    path: /etc/apt/trusted.gpg.d/docker.asc
+    state: absent
+
+- name: Delete older repo with older trusted.gpg.d key
+  apt_repository:
+    repo: "deb [arch={{ docker_apt_arch }} signed-by=/etc/apt/trusted.gpg.d/docker.asc] {{ docker_repo_url }}/{{ docker_apt_ansible_distribution | lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}"
+    state: absent
+    filename: "{{ docker_apt_filename }}"
+    update_cache: true
+  when: docker_add_repo | bool
+
+- name: Delete older docker deps
+  package:
+    name: "{{ docker_rm_pkgs }}"
+    state: absent
+
+- name: Install deps
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+    state: present
+  when: docker_add_repo | bool
+
+- name: Cretae key directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Add Docker apt key
+  get_url:
+    url: "{{ docker_apt_gpg_key }}"
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+    force: false
+    checksum: "{{ docker_apt_gpg_key_checksum | default(omit) }}"
+  register: add_repository_key
+  when: docker_add_repo | bool
+
+- name: Add curl for add docker apt key with curl
+  package: 
+    name: curl 
+    state: present
+  when: add_repository_key is failed and docker_add_repo | bool
+
+- name: Add docker apt key with curl
+  shell: >
+    curl -sSL {{ docker_apt_gpg_key }} | apt-key add -
+  when: add_repository_key is failed and docker_add_repo | bool
+
+- name: Add Docker repository.
+  apt_repository:
+    repo: "{{ docker_apt_repository }}"
+    state: present
+    filename: "{{ docker_apt_filename }}"
+    update_cache: true
+  when: docker_add_repo | bool
+  
+
+- name: Install Docker packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ docker_pkgs }}"

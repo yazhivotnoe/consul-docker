@@ -1,0 +1,30 @@
+---
+- name: Install Docker
+  hosts: docker
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+  - name: Check if Docker is already installed
+    command: docker -v
+    register: docker_check
+    ignore_errors: true
+
+  - name: Set docker_installed fact
+    set_fact:
+      docker_installed: "{{ docker_check.rc == 0 }}"
+
+  roles:
+  - role: docker
+    vars:
+      docker_users:
+      - ubuntu
+      - root
+    when: not docker_installed
+
+- name: Deploy specific tasks for consul
+  hosts: consul
+  become: true
+  gather_facts: true
+  roles:
+  - role: consul

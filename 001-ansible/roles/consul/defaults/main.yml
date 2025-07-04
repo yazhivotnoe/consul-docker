@@ -1,0 +1,25 @@
+victoriametrics_server_url: https://localhost:8427
+
+scrape_interval: 15s
+
+enable_vmauth_monitoring: false
+enable_vmstorage_monitoring: false
+enable_vminsert_monitoring: false
+enable_vmselect_monitoring: false
+
+scrape_api_enable: false
+scrape_api_scrape_interval: 3600s
+scrape_api_url: http://10.0.0.233/api/CreativeMultiArmedBanditsOptimization/GetAllActive
+scrape_api_image: example:api
+scrape_api_port: 515151
+
+# -----
+consul_deploy_path: /opt/consul
+consul_image_name: hashicorp/consul
+consul_image_tag: latest
+
+consul_server_cons:
+- name: consul-server
+  ports:
+  - 8500:8500
+  - 8600:8600/udp

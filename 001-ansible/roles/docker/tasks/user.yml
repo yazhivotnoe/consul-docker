@@ -1,0 +1,16 @@
+---
+- name: Create docker group
+  group:
+    name: docker
+    system: yes
+
+- name: Add user to docker group
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  with_items: "{{ docker_users }}"
+  notify: restart docker
+
+- name: Reset ssh connect
+  meta: reset_connection

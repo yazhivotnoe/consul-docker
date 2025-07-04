@@ -1,0 +1,17 @@
+galaxy_info:
+  author: jantttez
+  role_name: docker
+  description: docker install ansible role
+  license: license (GPL-2.0-or-later, MIT, etc)
+  min_ansible_version: "2.1"
+  platforms:
+  - name: Ubuntu
+    versions:
+    - noble
+    - jammy
+
+  galaxy_tags: 
+    - docker
+  
+
+dependencies: []
